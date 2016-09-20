@@ -1,8 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#e2ede4"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.yujie.heromanager.activity.MainActivity">
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_widthPercent="20%"
+        android:id="@+id/leftMenu"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        >
 
-</RelativeLayout>
+    </android.support.v7.widget.RecyclerView>
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="#000"
+        android:layout_toRightOf="@+id/leftMenu"
+        android:layout_marginLeft="30dp"/>
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_widthPercent="70%"
+        android:id="@+id/right_content"
+        android:layout_toRightOf="@id/leftMenu"
+        app:layout_marginLeftPercent="5%"
+        >
+
+    </android.support.v7.widget.RecyclerView>
+</android.support.percent.PercentRelativeLayout>

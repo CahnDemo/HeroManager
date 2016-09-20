@@ -27,6 +27,16 @@ public class I {
 		 String REQUEST_GET_CLASS_GRADE_LIST = "getClassGradeList";
 		 String REQUEST_UPDATE_USER = "updateUser";
 		 String REQUEST_SUPER_USER_LOGIN = "superUserlogin";
+		 String REQUEST_GET_ALLCLASS = "getAllClassList";
+		 String REQUEST_ADD_AREA = "addArea";
+		 String REQUEST_ADD_COURSE = "addCourse";
+		String REQUEST_ADD_START_TIME = "addStartTime";
+		String REQUEST_MOD_AREA = "modArea";
+		String REQUEST_MOD_COURSE = "modCourse";
+		String REQUEST_DEL_AREA = "delArea";
+		String REQUEST_DEL_COURSE = "delCourse";
+		String REQUEST_DEL_TIME = "delStartTime";
+		String REQUEST_DEL_CLASS = "delClass";
 	}
 
 	public interface SuperUser{
@@ -59,6 +69,7 @@ public class I {
 	public interface Course{
 		 String SIMPLE_NAME = "simple_name";
 		 String COURSE_NAME = "course_name";
+		String MARK = "mark";
 	}
 	
 	public interface Exam{
