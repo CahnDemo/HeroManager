@@ -1,5 +1,8 @@
 package com.yujie.heromanager.bean;
-public class ClassObj {
+
+import java.io.Serializable;
+
+public class ClassObj implements Serializable{
 	private int id;
 	private String class_name;
 	private String b_area;
