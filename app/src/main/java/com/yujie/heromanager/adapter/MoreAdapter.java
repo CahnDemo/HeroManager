@@ -143,7 +143,7 @@ public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         @Override
                         public boolean onLongClick(View v) {
                             listener.onItemLongClickListener(v,holder.getPosition(),o);
-                            return false;
+                            return true;
                         }
                     });
                 }
@@ -157,14 +157,14 @@ public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     classViewHolder.root.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            listener.onItemClickListener(v,holder.getPosition(),o);
+                            listener.onItemLongClickListener(v,holder.getPosition(),o);
                             return false;
                         }
                     });
                     classViewHolder.root.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            listener.onItemLongClickListener(v,holder.getPosition(),o);
+                            listener.onItemClickListener(v,holder.getPosition(),o);
                         }
                     });
                 }

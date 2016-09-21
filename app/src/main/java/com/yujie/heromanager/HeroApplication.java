@@ -4,14 +4,14 @@ import android.app.Application;
 
 import com.yujie.heromanager.bean.SuperUser;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * Created by yujie on 16-9-7.
  */
 public class HeroApplication extends Application {
     public static final String SERVER_ROOT = "http://115.28.2.61:8080/Hero/Server?";
-    public static final String AVATAR_ROOT = "http://115.28.2.61:8080/Hero/";
-    public static final String EXERCISE_CODE = "10010";
-    public static final String EXAM_CODE = "10011";
 
     public int getCURRENT_EXAM_ID() {
         return CURRENT_EXAM_ID;
@@ -19,6 +19,34 @@ public class HeroApplication extends Application {
 
     public void setCURRENT_EXAM_ID(int CURRENT_EXAM_ID) {
         this.CURRENT_EXAM_ID = CURRENT_EXAM_ID;
+    }
+
+    private HashMap<String,String> courseMap;
+    private HashMap<String,String> areaMap;
+    private ArrayList<String> timelist;
+
+    public ArrayList<String> getTimelist() {
+        return timelist;
+    }
+
+    public void setTimelist(ArrayList<String> timelist) {
+        this.timelist = timelist;
+    }
+
+    public HashMap<String, String> getAreaMap() {
+        return areaMap;
+    }
+
+    public void setAreaMap(HashMap<String, String> areaMap) {
+        this.areaMap = areaMap;
+    }
+
+    public HashMap<String, String> getCourseMap() {
+        return courseMap;
+    }
+
+    public void setCourseMap(HashMap<String, String> courseMap) {
+        this.courseMap = courseMap;
     }
 
     private int CURRENT_EXAM_ID = 0;

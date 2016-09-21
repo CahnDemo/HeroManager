@@ -35,6 +35,7 @@ import com.yujie.heromanager.utils.OkHttpUtils;
 import com.yujie.heromanager.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.right_content)
     RecyclerView rightContent;
     int flag = 0;
+    boolean hasOpt = false;
     String[] menu_array = {
             "校区 ","学科","期数","班级","考试"
     };
@@ -70,6 +72,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         intView();
+        initData();
+    }
+
+    private void initData() {
+        showClass();
+        showCourse();
+        showArea();
+        showStartTime();
     }
 
 
@@ -81,12 +91,20 @@ public class MainActivity extends AppCompatActivity {
         rightContent.setItemAnimator(new DefaultItemAnimator());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hasOpt = true;
+        showClass();
+    }
+
     /**
      * listener
      */
     private void showOneDialog(Object o, int position) {
         if (o instanceof ClassObj){
             ClassObj obj = (ClassObj) o;
+            initMapData();
             Intent intent = new Intent(mContext,ModClassActivity.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable("classObj",obj);
@@ -151,6 +169,24 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .create();
         dialog.show();
+    }
+
+    private void initMapData() {
+        HashMap<String,String> areaMap = new HashMap<>();
+        for (AreasBean a:areas){
+            areaMap.put(a.getArea_name(),a.getSimple_name());
+        }
+        HashMap<String,String> courseMap = new HashMap<>();
+        for (CourseBean b:courses){
+            courseMap.put(b.getCourse_name(),b.getSimple_name());
+        }
+        ArrayList<String> timeList = new ArrayList<>();
+        for (StartTimeBean s:times){
+            timeList.add(s.getStart_time());
+        }
+        HeroApplication.getInstance().setAreaMap(areaMap);
+        HeroApplication.getInstance().setCourseMap(courseMap);
+        HeroApplication.getInstance().setTimelist(timeList);
     }
 
 
@@ -223,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onSuccess(Result result) {
                             if (result!=null&result.isFlag()){
                                 Toast.makeText(mContext,"添加成功",Toast.LENGTH_LONG).show();
+                                hasOpt = true;
                                 showArea();
                             }
                         }
@@ -245,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onSuccess(Result result) {
                             if (result!=null&result.isFlag()){
                                 Toast.makeText(mContext,"添加成功",Toast.LENGTH_LONG).show();
+                                hasOpt = true;
                                 showCourse();
                             }
                         }
@@ -266,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onSuccess(Result result) {
                             if (result!=null&result.isFlag()){
                                 Toast.makeText(mContext,"添加成功",Toast.LENGTH_LONG).show();
+                                hasOpt = true;
                                 showStartTime();
                             }
                         }
@@ -281,6 +320,7 @@ public class MainActivity extends AppCompatActivity {
     private void delDataToServer(final Object o, int position) {
         if (o instanceof AreasBean){
             Toast.makeText(MainActivity.this,"不允许随意删除校区，请联系系统管理员进行删除",Toast.LENGTH_LONG).show();
+            hasOpt = true;
             showArea();
         }else if (o instanceof CourseBean){
             OkHttpUtils<ExerciseBean[]> utils = new OkHttpUtils<>();
@@ -295,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this,"数据未清除，不能删除学科",Toast.LENGTH_LONG).show();
                             }else {
                                 delDataUtils(((CourseBean) o).getSimple_name(),I.Course.SIMPLE_NAME,I.Request.REQUEST_DEL_COURSE);
+                                hasOpt = true;
                                 showCourse();
                             }
                         }
@@ -317,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this,"数据未清除，不能删除学期",Toast.LENGTH_LONG).show();
                             }else {
                                 delDataUtils(((StartTimeBean) o).getStart_time(),I.StartTime.START_TIME,I.Request.REQUEST_DEL_TIME);
+                                hasOpt = true;
                                 showStartTime();
                             }
                         }
@@ -339,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this,"数据未清除，不能删除班级",Toast.LENGTH_LONG).show();
                             }else {
                                 delDataUtils(((ClassObj) o).getSimple_name(),I.IClass.SIMPLE_NAME,I.Request.REQUEST_DEL_CLASS);
+                                hasOpt = true;
                                 showClass();
                             }
                         }
@@ -394,16 +437,16 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     switch (position){
                         case 0:
-                            showArea();
+                            initAdapter(areas,0);
                             break;
                         case 1:
-                            showCourse();
+                            initAdapter(courses,1);
                             break;
                         case 2:
-                            showStartTime();
+                            initAdapter(times,2);
                             break;
                         case 3:
-                            showClass();
+                            initAdapter(classes,3);
                             break;
                         case 4:
                             showExam();
@@ -433,9 +476,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(ClassObj[] result) {
                         if (result!=null & result.length!=0){
                             classes = Utils.array2List(result);
-                            adapter = new MoreAdapter(classes,mContext,3);
-                            rightContent.setAdapter(adapter);
-                            setAdapterListener();
+                            if (hasOpt){
+                                initAdapter(classes,3);
+                                hasOpt = false;
+                            }
                         }
                     }
 
@@ -457,9 +501,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(StartTimeBean[] result) {
                         if (result!=null & result.length!=0){
                             times = Utils.array2List(result);
-                            adapter = new MoreAdapter(times,mContext,2);
-                            rightContent.setAdapter(adapter);
-                            setAdapterListener();
+                            if (hasOpt){
+                                initAdapter(times,2);
+                                hasOpt = false;
+                            }
                         }
                     }
 
@@ -481,9 +526,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(CourseBean[] result) {
                         if (result!=null & result.length!=0){
                             courses = Utils.array2List(result);
-                            adapter = new MoreAdapter(courses,mContext,1);
-                            rightContent.setAdapter(adapter);
-                            setAdapterListener();
+                            if (hasOpt){
+                                initAdapter(courses,1);
+                                hasOpt = false;
+                            }
                         }
                     }
 
@@ -505,9 +551,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(AreasBean[] result) {
                         if (result!=null & result.length!=0){
                             areas = Utils.array2List(result);
-                            adapter = new MoreAdapter(areas,mContext,0);
-                            rightContent.setAdapter(adapter);
-                            setAdapterListener();
+                            if (hasOpt){
+                                initAdapter(areas,0);
+                                hasOpt = false;
+                            }
                         }
                     }
 
@@ -516,6 +563,12 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    private void initAdapter(ArrayList<?> list,int position) {
+        adapter = new MoreAdapter(list,mContext,position);
+        rightContent.setAdapter(adapter);
+        setAdapterListener();
     }
 
     private void setAdapterListener() {

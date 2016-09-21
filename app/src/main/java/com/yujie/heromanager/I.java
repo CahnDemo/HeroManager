@@ -37,6 +37,8 @@ public class I {
 		String REQUEST_DEL_COURSE = "delCourse";
 		String REQUEST_DEL_TIME = "delStartTime";
 		String REQUEST_DEL_CLASS = "delClass";
+		String REQUEST_MOD_CLASS = "modClass";
+		String REQUEST_ADD_CLASS = "addClass";
 	}
 
 	public interface SuperUser{
