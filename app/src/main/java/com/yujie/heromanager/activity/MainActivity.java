@@ -462,7 +462,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showExam() {
-
+        startActivity(new Intent(this,ExamActivity.class));
     }
 
     private void showClass() {

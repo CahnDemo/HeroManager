@@ -39,6 +39,7 @@ public class I {
 		String REQUEST_DEL_CLASS = "delClass";
 		String REQUEST_MOD_CLASS = "modClass";
 		String REQUEST_ADD_CLASS = "addClass";
+		String REQUEST_GET_ALL_EXAM = "getExamList";
 	}
 
 	public interface SuperUser{
