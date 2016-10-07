@@ -1,7 +1,9 @@
 package com.yujie.heromanager.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import com.yujie.heromanager.R;
 import com.yujie.heromanager.bean.ExamBean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by yujie on 16-9-24.
@@ -31,7 +34,8 @@ class ExamViewHolder extends RecyclerView.ViewHolder{
         exam_status = (CheckBox) itemView.findViewById(R.id.exam_status);
     }
 }
-public class ExamAdapter extends RecyclerView.Adapter<ExamViewHolder>{
+public class ExamAdapter extends RecyclerView.Adapter<ExamViewHolder> {
+    public static final String TAG = ExamAdapter.class.getSimpleName();
     private Context mContext;
     private LayoutInflater inflater;
     private ArrayList<ExamBean> examList;
@@ -57,8 +61,10 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamViewHolder>{
         holder.exam_name.setText(item.getExam_name());
         holder.exam_time.setText(item.getExam_time());
         holder.exam_course.setText(item.getCourse_id());
-        if (item.getStatus()==1){
+        Log.e(TAG, "onBindViewHolder: "+item);
+        if (item.getState()==1){
             holder.exam_status.setChecked(true);
+            holder.exam_name.setTextColor(Color.RED);
         }else {
             holder.exam_status.setChecked(false);
         }
@@ -72,4 +78,5 @@ public class ExamAdapter extends RecyclerView.Adapter<ExamViewHolder>{
     public ExamBean getItem(int position){
         return examList.get(position);
     }
+
 }

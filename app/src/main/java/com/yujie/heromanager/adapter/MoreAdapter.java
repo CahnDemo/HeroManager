@@ -6,9 +6,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,18 +30,19 @@ import com.yujie.heromanager.bean.StartTimeBean;
 import com.yujie.heromanager.utils.OkHttpUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
 
 import dalvik.system.DexClassLoader;
 
 /**
  * Created by yujie on 16-9-20.
  */
-public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private ArrayList<?> dataList;
     private Activity mContext;
     private LayoutInflater inflater;
     private int holdID;
-    private int flag = 0;
     private OnItemActionListener listener;
 
     public void setListener(OnItemActionListener listener) {
@@ -48,6 +52,7 @@ public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public interface OnItemActionListener{
         void onItemClickListener(View v,int position,Object o);
         void onItemLongClickListener(View v,int position,Object o);
+        void onItemSwipListener(int position, Object o);
     }
     public MoreAdapter(ArrayList<?> dataList, Activity mContext,int holdID) {
         this.dataList = dataList;
@@ -104,6 +109,12 @@ public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             return false;
                         }
                     });
+                    areaViewHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            listener.onItemSwipListener(holder.getPosition(),o);
+                        }
+                    });
                 }
                 break;
             case 1:
@@ -123,6 +134,12 @@ public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         public boolean onLongClick(View v) {
                             listener.onItemLongClickListener(v,holder.getPosition(),o);
                             return false;
+                        }
+                    });
+                    courseViewHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            listener.onItemSwipListener(holder.getPosition(),o);
                         }
                     });
                 }
@@ -146,6 +163,12 @@ public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             return true;
                         }
                     });
+                    timeViewHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            listener.onItemSwipListener(holder.getPosition(),o);
+                        }
+                    });
                 }
                 break;
             case 3:
@@ -165,6 +188,12 @@ public class MoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         @Override
                         public void onClick(View v) {
                             listener.onItemClickListener(v,holder.getPosition(),o);
+                        }
+                    });
+                    classViewHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            listener.onItemSwipListener(holder.getPosition(),o);
                         }
                     });
                 }
@@ -187,11 +216,13 @@ class AreaViewHolder extends RecyclerView.ViewHolder{
     TextView area_name;
     TextView area_simple_name;
     RelativeLayout root;
+    Button deleteBtn;
     public AreaViewHolder(View itemView) {
         super(itemView);
         area_name = (TextView) itemView.findViewById(R.id.area_name);
         area_simple_name = (TextView) itemView.findViewById(R.id.area_simple_name);
         root = (RelativeLayout) itemView.findViewById(R.id.root_layout);
+        deleteBtn = (Button) itemView.findViewById(R.id.deleteBtn);
     }
 }
 
@@ -202,11 +233,13 @@ class CourseViewHolder extends RecyclerView.ViewHolder{
     TextView course_name;
     TextView course_simple_name;
     RelativeLayout root;
+    Button deleteBtn;
     public CourseViewHolder(View itemView) {
         super(itemView);
         course_name = (TextView) itemView.findViewById(R.id.area_name);
         course_simple_name = (TextView) itemView.findViewById(R.id.area_simple_name);
         root = (RelativeLayout) itemView.findViewById(R.id.root_layout);
+        deleteBtn = (Button) itemView.findViewById(R.id.deleteBtn);
     }
 }
 
@@ -217,11 +250,13 @@ class TimeViewHolder extends RecyclerView.ViewHolder{
     TextView timeTxt;
     TextView tag;
     RelativeLayout root;
+    Button deleteBtn;
     public TimeViewHolder(View itemView) {
         super(itemView);
         timeTxt = (TextView) itemView.findViewById(R.id.area_name);
         tag = (TextView) itemView.findViewById(R.id.area_simple_name);
         root = (RelativeLayout) itemView.findViewById(R.id.root_layout);
+        deleteBtn = (Button) itemView.findViewById(R.id.deleteBtn);
     }
 }
 
@@ -233,10 +268,12 @@ class ClassViewHolder extends RecyclerView.ViewHolder{
     TextView classTxt;
     TextView tag;
     RelativeLayout root;
+    Button deleteBtn;
     public ClassViewHolder(View itemView) {
         super(itemView);
         classTxt = (TextView) itemView.findViewById(R.id.area_name);
         tag = (TextView) itemView.findViewById(R.id.area_simple_name);
         root = (RelativeLayout) itemView.findViewById(R.id.root_layout);
+        deleteBtn = (Button) itemView.findViewById(R.id.deleteBtn);
     }
 }

@@ -13,6 +13,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ThemedSpinnerAdapter;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.yujie.heromanager.HeroApplication;
 import com.yujie.heromanager.I;
 import com.yujie.heromanager.R;
 import com.yujie.heromanager.adapter.MoreAdapter;
+import com.yujie.heromanager.adapter.MoveAndSwipCallBack;
 import com.yujie.heromanager.bean.AreasBean;
 import com.yujie.heromanager.bean.ClassObj;
 import com.yujie.heromanager.bean.CourseBean;
@@ -317,83 +319,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void delDataToServer(final Object o, int position) {
-        if (o instanceof AreasBean){
-            Toast.makeText(MainActivity.this,"不允许随意删除校区，请联系系统管理员进行删除",Toast.LENGTH_LONG).show();
-            hasOpt = true;
-            showArea();
-        }else if (o instanceof CourseBean){
-            OkHttpUtils<ExerciseBean[]> utils = new OkHttpUtils<>();
-            utils.url(HeroApplication.SERVER_ROOT)
-                    .addParam(I.REQUEST,I.Request.REQUEST_GET_SORT_IN_COURSE)
-                    .addParam(I.Exercise.B_CLASS,((CourseBean) o).getSimple_name())
-                    .targetClass(ExerciseBean[].class)
-                    .execute(new OkHttpUtils.OnCompleteListener<ExerciseBean[]>() {
-                        @Override
-                        public void onSuccess(ExerciseBean[] result) {
-                            if (result!=null & result.length!=0){
-                                Toast.makeText(MainActivity.this,"数据未清除，不能删除学科",Toast.LENGTH_LONG).show();
-                            }else {
-                                delDataUtils(((CourseBean) o).getSimple_name(),I.Course.SIMPLE_NAME,I.Request.REQUEST_DEL_COURSE);
-                                hasOpt = true;
-                                showCourse();
-                            }
-                        }
-
-                        @Override
-                        public void onError(String error) {
-                            Toast.makeText(MainActivity.this,"不能连接到服务器，请稍后再试",Toast.LENGTH_LONG).show();
-                        }
-                    });
-        }else if (o instanceof StartTimeBean){
-            OkHttpUtils<ExerciseBean[]> utils = new OkHttpUtils<>();
-            utils.url(HeroApplication.SERVER_ROOT)
-                    .addParam(I.REQUEST,I.Request.REQUEST_GET_SORT_IN_TIME)
-                    .addParam(I.Exercise.B_CLASS,((StartTimeBean) o).getStart_time())
-                    .targetClass(ExerciseBean[].class)
-                    .execute(new OkHttpUtils.OnCompleteListener<ExerciseBean[]>() {
-                        @Override
-                        public void onSuccess(ExerciseBean[] result) {
-                            if (result!=null & result.length!=0){
-                                Toast.makeText(MainActivity.this,"数据未清除，不能删除学期",Toast.LENGTH_LONG).show();
-                            }else {
-                                delDataUtils(((StartTimeBean) o).getStart_time(),I.StartTime.START_TIME,I.Request.REQUEST_DEL_TIME);
-                                hasOpt = true;
-                                showStartTime();
-                            }
-                        }
-
-                        @Override
-                        public void onError(String error) {
-                            Toast.makeText(MainActivity.this,"不能连接到服务器，请稍后再试",Toast.LENGTH_LONG).show();
-                        }
-                    });
-        }else if (o instanceof ClassObj){
-            OkHttpUtils<ExerciseBean[]> utils = new OkHttpUtils<>();
-            utils.url(HeroApplication.SERVER_ROOT)
-                    .addParam(I.REQUEST,I.Request.REQUEST_GET_SORT_IN_CLASS)
-                    .addParam(I.Exercise.B_CLASS,((ClassObj) o).getId()+"")
-                    .targetClass(ExerciseBean[].class)
-                    .execute(new OkHttpUtils.OnCompleteListener<ExerciseBean[]>() {
-                        @Override
-                        public void onSuccess(ExerciseBean[] result) {
-                            if (result!=null & result.length!=0){
-                                Toast.makeText(MainActivity.this,"数据未清除，不能删除班级",Toast.LENGTH_LONG).show();
-                            }else {
-                                delDataUtils(((ClassObj) o).getSimple_name(),I.IClass.SIMPLE_NAME,I.Request.REQUEST_DEL_CLASS);
-                                hasOpt = true;
-                                showClass();
-                            }
-                        }
-
-                        @Override
-                        public void onError(String error) {
-                        Toast.makeText(MainActivity.this,"不能连接到服务器，请稍后再试",Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-        }
-    }
 
     private void delDataUtils(String params, String key, final String request_value) {
         OkHttpUtils<Result> utils = new OkHttpUtils<>();
@@ -565,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void initAdapter(ArrayList<?> list,int position) {
+    private void initAdapter(final ArrayList<?> list, int position) {
         adapter = new MoreAdapter(list,mContext,position);
         rightContent.setAdapter(adapter);
         setAdapterListener();
@@ -575,14 +500,94 @@ public class MainActivity extends AppCompatActivity {
         adapter.setListener(new MoreAdapter.OnItemActionListener() {
             @Override
             public void onItemClickListener(View v, int position, Object o) {
-                showOneDialog(o,position);
+
             }
 
             @Override
             public void onItemLongClickListener(View v, int position, Object o) {
-                delDataToServer(o,position);
+                showOneDialog(o,position);
+            }
+
+            @Override
+            public void onItemSwipListener(int position, final Object o) {
+                if (o instanceof AreasBean){
+                    Toast.makeText(MainActivity.this,"不允许随意删除校区，请联系系统管理员进行删除",Toast.LENGTH_LONG).show();
+                    hasOpt = true;
+                    showArea();
+                }else if (o instanceof CourseBean){
+                    OkHttpUtils<ExerciseBean[]> utils = new OkHttpUtils<>();
+                    utils.url(HeroApplication.SERVER_ROOT)
+                            .addParam(I.REQUEST,I.Request.REQUEST_GET_SORT_IN_COURSE)
+                            .addParam(I.Exercise.COURSE_ID,((CourseBean) o).getSimple_name())
+                            .targetClass(ExerciseBean[].class)
+                            .execute(new OkHttpUtils.OnCompleteListener<ExerciseBean[]>() {
+                                @Override
+                                public void onSuccess(ExerciseBean[] result) {
+                                    if (result!=null & result.length!=0){
+                                        Toast.makeText(MainActivity.this,"数据未清除，不能删除学科",Toast.LENGTH_LONG).show();
+                                    }else {
+                                        delDataUtils(((CourseBean) o).getSimple_name(),I.Course.SIMPLE_NAME,I.Request.REQUEST_DEL_COURSE);
+                                        hasOpt = true;
+                                        showCourse();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    Toast.makeText(MainActivity.this,"不能连接到服务器，请稍后再试",Toast.LENGTH_LONG).show();
+                                }
+                            });
+                }else if (o instanceof StartTimeBean){
+                    OkHttpUtils<ExerciseBean[]> utils = new OkHttpUtils<>();
+                    utils.url(HeroApplication.SERVER_ROOT)
+                            .addParam(I.REQUEST,I.Request.REQUEST_GET_SORT_IN_TIME)
+                            .addParam(I.Exercise.START_TIME,((StartTimeBean) o).getStart_time())
+                            .targetClass(ExerciseBean[].class)
+                            .execute(new OkHttpUtils.OnCompleteListener<ExerciseBean[]>() {
+                                @Override
+                                public void onSuccess(ExerciseBean[] result) {
+                                    if (result!=null & result.length!=0){
+                                        Toast.makeText(MainActivity.this,"数据未清除，不能删除学期",Toast.LENGTH_LONG).show();
+                                    }else {
+                                        delDataUtils(((StartTimeBean) o).getStart_time(),I.StartTime.START_TIME,I.Request.REQUEST_DEL_TIME);
+                                        hasOpt = true;
+                                        showStartTime();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    Toast.makeText(MainActivity.this,"不能连接到服务器，请稍后再试",Toast.LENGTH_LONG).show();
+                                }
+                            });
+                }else if (o instanceof ClassObj){
+                    OkHttpUtils<ExerciseBean[]> utils = new OkHttpUtils<>();
+                    utils.url(HeroApplication.SERVER_ROOT)
+                            .addParam(I.REQUEST,I.Request.REQUEST_GET_SORT_IN_CLASS)
+                            .addParam(I.Exercise.B_CLASS,((ClassObj) o).getId()+"")
+                            .targetClass(ExerciseBean[].class)
+                            .execute(new OkHttpUtils.OnCompleteListener<ExerciseBean[]>() {
+                                @Override
+                                public void onSuccess(ExerciseBean[] result) {
+                                    if (result!=null & result.length!=0){
+                                        Toast.makeText(MainActivity.this,"数据未清除，不能删除班级",Toast.LENGTH_LONG).show();
+                                    }else {
+                                        delDataUtils(((ClassObj) o).getSimple_name(),I.IClass.SIMPLE_NAME,I.Request.REQUEST_DEL_CLASS);
+                                        hasOpt = true;
+                                        showClass();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    Toast.makeText(MainActivity.this,"不能连接到服务器，请稍后再试",Toast.LENGTH_LONG).show();
+                                }
+                            });
+
+                }
             }
         });
+
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
